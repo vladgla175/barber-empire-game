@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Barber Empire — Walk Mode</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:#0d0b13;color:#fff;font-family:Arial,sans-serif;overflow:hidden}
+#game{display:block;width:100vw;height:100vh;background:#d7b982;touch-action:none}
+.hud{position:fixed;top:12px;left:12px;right:12px;display:flex;justify-content:space-between;gap:8px;pointer-events:none}
+.badge{background:#17131fdd;border:1px solid #ffffff22;border-radius:14px;padding:9px 12px;font-weight:800;box-shadow:0 5px 20px #0004}
+#message{position:fixed;left:50%;bottom:145px;transform:translateX(-50%);background:#17131fee;border:1px solid #ffffff22;border-radius:16px;padding:12px 16px;text-align:center;max-width:90%;font-weight:700;display:none}
+#controls{position:fixed;bottom:18px;left:18px;right:18px;display:flex;justify-content:space-between;align-items:end;pointer-events:none}
+.pad{display:grid;grid-template-columns:repeat(3,48px);grid-template-rows:repeat(3,48px);gap:5px;pointer-events:auto}
+.pad button,.action{background:#211a2ddd;border:1px solid #ffffff28;color:white;border-radius:14px;font-size:23px;font-weight:900;box-shadow:0 5px 15px #0005}
+.pad button:active,.action:active{background:#8e50e8}
+.pad .empty{visibility:hidden}
+.actions{display:flex;gap:8px;pointer-events:auto}
+.action{width:66px;height:66px;font-size:27px}
+#modal{position:fixed;inset:0;background:#0008;display:none;align-items:center;justify-content:center;padding:20px}
+.card{width:min(420px,100%);background:#211a2d;border:1px solid #ffffff22;border-radius:22px;padding:20px;box-shadow:0 20px 60px #0008}
+.card h2{margin-top:0}
+.card button{width:100%;padding:14px;border:0;border-radius:14px;background:#9957f2;color:white;font-weight:900;margin-top:10px}
+.item{display:flex;justify-content:space-between;gap:10px;padding:12px 0;border-bottom:1px solid #ffffff18}
+.small{color:#b8adc9;font-size:13px}
+</style>
+</head>
+<body>
+<canvas id="game"></canvas>
+<div class="hud">
+  <div class="badge">💈 BARBER EMPIRE<br><span class="small">Ходи по салону</span></div>
+  <div class="badge">🪙 <span id="coins">500</span><br>🎁 <span id="bonus">0</span></div>
+</div>
+<div id="message"></div>
+<div id="controls">
+  <div class="pad">
+    <button class="empty">·</button><button data-key="up">▲</button><button class="empty">·</button>
+    <button data-key="left">◀</button><button data-key="down">▼</button><button data-key="right">▶</button>
+    <button class="empty">·</button><button class="empty">·</button><button class="empty">·</button>
+  </div>
+  <div class="actions">
+    <button class="action" id="interact">✋</button>
+    <button class="action" id="shop">🛒</button>
+  </div>
+</div>
+<div id="modal">
+  <div class="card">
+    <h2 id="modalTitle">Магазин</h2>
+    <div id="modalBody"></div>
+    <button id="close">Закрыть</button>
+  </div>
+</div>
+<script>
+const canvas=document.getElementById('game'),ctx=canvas.getContext('2d');
+let W=innerWidth,H=innerHeight,scale=1;
+function resize(){W=innerWidth;H=innerHeight;canvas.width=W*devicePixelRatio;canvas.height=H*devicePixelRatio;ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);scale=Math.min(W/390,H/700)}
+addEventListener('resize',resize);resize();
+
+let save=JSON.parse(localStorage.getItem('barberWalkSave')||'null')||{coins:500,bonus:0,chairs:1,tool:false,served:0};
+const player={x:195,y:475,r:18,speed:3.2};
+const keys={up:false,down:false,left:false,right:false};
+const objects={
+ chair:{x:195,y:245,w:85,h:100},
+ counter:{x:65,y:185,w:105,h:52},
+ shelf:{x:300,y:180,w:80,h:55},
+ customer:{x:195,y:350,r:23}
+};
+function money(){document.getElementById('coins').textContent=save.coins;document.getElementById('bonus').textContent=save.bonus;localStorage.setItem('barberWalkSave',JSON.stringify(save))}
+function msg(t){const el=document.getElementById('message');el.textContent=t;el.style.display='block';clearTimeout(msg.timer);msg.timer=setTimeout(()=>el.style.display='none',2500)}
+function rect(x,y,w,h,color,stroke='#0002'){ctx.fillStyle=color;ctx.fillRect(x,y,w,h);ctx.strokeStyle=stroke;ctx.lineWidth=2;ctx.strokeRect(x,y,w,h)}
+function text(t,x,y,size=14,color='#fff',align='center'){ctx.fillStyle=color;ctx.font='bold '+size+'px Arial';ctx.textAlign=align;ctx.fillText(t,x,y)}
+function draw(){
+ ctx.clearRect(0,0,W,H);
+ const sx=W/390, sy=H/700, s=Math.min(sx,sy);
+ ctx.save();ctx.translate((W-390*s)/2,(H-700*s)/2);ctx.scale(s,s);
+ // floor
+ ctx.fillStyle='#d8bd88';ctx.fillRect(0,0,390,700);
+ for(let y=0;y<700;y+=42){ctx.strokeStyle='#c9aa73';ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(390,y);ctx.stroke()}
+ for(let x=0;x<390;x+=42){ctx.strokeStyle='#e6ce9f';ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,700);ctx.stroke()}
+ // walls
+ rect(0,0,390,65,'#76503d');rect(0,65,390,8,'#3c2930');
+ text('BARBER EMPIRE',195,43,22,'#ffd36b');
+ // window / decor
+ rect(18,88,110,70,'#7bc5d1');rect(25,95,96,56,'#b9e6e8');text('OPEN',73,130,17,'#563c35');
+ rect(260,82,105,76,'#76503d');text('✂',312,124,42,'#f6cf70');
+ // counter
+ rect(objects.counter.x,objects.counter.y,objects.counter.w,objects.counter.h,'#75452d');rect(58,176,120,15,'#a56c45');
+ text('КАССА',112,211,12,'#ffe2a4');
+ // shelf
+ rect(objects.shelf.x,objects.shelf.y,objects.shelf.w,objects.shelf.h,'#75452d');
+ text('🧴  🧴  🧴',340,213,19);
+ // chair
+ rect(153,240,85,100,'#8c5838');rect(164,226,63,70,'#b77b4d');rect(172,232,47,53,'#e5c39b');
+ // customer
+ ctx.fillStyle='#4b2b20';ctx.beginPath();ctx.arc(195,346,27,0,Math.PI*2);ctx.fill();
+ ctx.fillStyle='#e4a77e';ctx.beginPath();ctx.arc(195,350,20,0,Math.PI*2);ctx.fill();
+ ctx.fillStyle='#25202a';ctx.fillRect(175,365,40,44);text('🧔🏻',195,370,31);
+ // wash basin
+ ctx.fillStyle='#f0eee5';ctx.beginPath();ctx.ellipse(310,330,43,28,0,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#8e8b88';ctx.stroke();text('🚿',310,340,25);
+ // player
+ ctx.fillStyle='#332344';ctx.beginPath();ctx.arc(player.x,player.y,player.r,0,Math.PI*2);ctx.fill();
+ ctx.fillStyle='#dca27c';ctx.beginPath();ctx.arc(player.x,player.y-4,11,0,Math.PI*2);ctx.fill();
+ ctx.fillStyle='#29202b';ctx.fillRect(player.x-12,player.y+7,24,18);text('✂',player.x,player.y+5,17,'#ffd36b');
+ // interaction hints
+ text('✋ Подойди к креслу и нажми',195,570,13,'#4d352c');
+ text('🛒 Магазин',330,620,13,'#4d352c');
+ ctx.restore();
+}
+function near(o,dist=75){return Math.hypot(player.x-o.x,player.y-o.y)<dist}
+function interact(){
+ if(near(objects.chair,100)){openCut();return}
+ if(near(objects.counter,90)){openShop();return}
+ msg('Подойди к креслу для стрижки или к кассе для магазина.');
+}
+function openCut(){
+ document.getElementById('modalTitle').textContent='✂️ Стрижка клиента';
+ document.getElementById('modalBody').innerHTML='<p>Клиент ждёт новую причёску.</p><p class="small">Нажми кнопку несколько раз, чтобы завершить стрижку.</p><button id="cut">Начать стрижку ✂️</button>';
+ document.getElementById('modal').style.display='flex';
+ let n=0;
+ document.getElementById('cut').onclick=()=>{
+  n++;
+  if(n<5){document.getElementById('cut').textContent='Стрижём... '+n+'/5';}
+  else{save.coins+=save.tool?80:50;save.bonus+=5;save.served++;money();document.getElementById('modalBody').innerHTML='<h3>Готово! Клиент доволен 🎉</h3><p>+ '+(save.tool?80:50)+' 🪙 и +5 🎁</p>';msg('Стрижка завершена!');}
+ };
+}
+function openShop(){
+ document.getElementById('modalTitle').textContent='🛒 Магазин';
+ document.getElementById('modalBody').innerHTML=`
+ <div class="item"><div><b>⚡ Проф. машинка</b><div class="small">Больше монет за стрижку</div></div><button onclick="buy('tool',450)">450 🪙</button></div>
+ <div class="item"><div><b>🪑 Второе кресло</b><div class="small">Улучшение салона</div></div><button onclick="buy('chair',300)">300 🪙</button></div>
+ <div class="item"><div><b>✨ Интерьер</b><div class="small">Красивый салон</div></div><button onclick="buy('decor',700)">700 🪙</button></div>`;
+ document.getElementById('modal').style.display='flex';
+}
+window.buy=(type,cost)=>{
+ if(save[type]){msg('Уже куплено');return}
+ if(save.coins<cost){msg('Не хватает монет');return}
+ save.coins-=cost;save[type]=true;money();msg('Покупка совершена!');openShop();
+};
+document.getElementById('close').onclick=()=>document.getElementById('modal').style.display='none';
+document.getElementById('interact').onclick=interact;
+document.getElementById('shop').onclick=openShop;
+document.querySelectorAll('[data-key]').forEach(b=>{
+ const k=b.dataset.key;
+ b.addEventListener('pointerdown',e=>{e.preventDefault();keys[k]=true});
+ ['pointerup','pointercancel','pointerleave'].forEach(ev=>b.addEventListener(ev,()=>keys[k]=false));
+});
+addEventListener('keydown',e=>{if(e.key==='ArrowUp'||e.key==='w')keys.up=true;if(e.key==='ArrowDown'||e.key==='s')keys.down=true;if(e.key==='ArrowLeft'||e.key==='a')keys.left=true;if(e.key==='ArrowRight'||e.key==='d')keys.right=true;if(e.key==='e')interact()});
+addEventListener('keyup',e=>{if(e.key==='ArrowUp'||e.key==='w')keys.up=false;if(e.key==='ArrowDown'||e.key==='s')keys.down=false;if(e.key==='ArrowLeft'||e.key==='a')keys.left=false;if(e.key==='ArrowRight'||e.key==='d')keys.right=false});
+function loop(){
+ if(!document.getElementById('modal').style.display||document.getElementById('modal').style.display==='none'){
+  if(keys.up)player.y-=player.speed;if(keys.down)player.y+=player.speed;if(keys.left)player.x-=player.speed;if(keys.right)player.x+=player.speed;
+  player.x=Math.max(22,Math.min(368,player.x));player.y=Math.max(85,Math.min(660,player.y));
+ }
+ draw();requestAnimationFrame(loop);
+}
+money();loop();
+</script>
+</body>
+</html>
