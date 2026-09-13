@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Barber Empire</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div><div class="eyebrow">BARBER EMPIRE</div><h1>Мой барбершоп</h1></div>
+      <div class="level">Ур. <span id="level">1</span></div>
+    </header>
+
+    <section class="stats">
+      <div class="stat"><span>🪙 Монеты</span><strong id="coins">500</strong></div>
+      <div class="stat"><span>✂️ Клиенты</span><strong id="served">0</strong></div>
+      <div class="stat"><span>💺 Кресла</span><strong id="chairs">1</strong></div>
+    </section>
+
+    <section class="shop-scene">
+      <div class="sign">BARBER<br><b>EMPIRE</b></div>
+      <div class="mirror"></div>
+      <div class="chair chair-back"></div>
+      <div class="chair chair-front"></div>
+      <div class="plant">🌿</div>
+      <div class="floor-line"></div>
+      <div class="client" id="client">🙂</div>
+      <div class="bubble" id="bubble">Новый клиент ждёт стрижку!</div>
+    </section>
+
+    <section class="panel">
+      <h2>Текущая смена</h2>
+      <p id="status">Клиент готов. Нажми «Начать стрижку».</p>
+      <div class="progress"><div id="progressBar"></div></div>
+      <button id="cutBtn" class="primary">✂️ Начать стрижку</button>
+      <button id="upgradeBtn" class="secondary">💺 Купить кресло — 300 🪙</button>
+      <button id="resetBtn" class="ghost">Сбросить тестовый прогресс</button>
+    </section>
+
+    <section class="panel bonus-panel">
+      <h2>🎁 Бонусы на реальные стрижки</h2>
+      <p>В этой тестовой версии бонусы пока не начисляются. Подключим их после настройки серверного API.</p>
+      <button id="bookingBtn" class="secondary">📅 Записаться на стрижку</button>
+    </section>
+  </main>
+  <script src="game.js"></script>
+</body>
+</html>
