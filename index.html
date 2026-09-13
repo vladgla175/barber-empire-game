@@ -1,51 +1,24 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Barber Empire</title>
-  <link rel="stylesheet" href="style.css" />
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-</head>
-<body>
-  <main class="app">
-    <header class="topbar">
-      <div><div class="eyebrow">BARBER EMPIRE</div><h1>Мой барбершоп</h1></div>
-      <div class="level">Ур. <span id="level">1</span></div>
-    </header>
-
-    <section class="stats">
-      <div class="stat"><span>🪙 Монеты</span><strong id="coins">500</strong></div>
-      <div class="stat"><span>✂️ Клиенты</span><strong id="served">0</strong></div>
-      <div class="stat"><span>💺 Кресла</span><strong id="chairs">1</strong></div>
-    </section>
-
-    <section class="shop-scene">
-      <div class="sign">BARBER<br><b>EMPIRE</b></div>
-      <div class="mirror"></div>
-      <div class="chair chair-back"></div>
-      <div class="chair chair-front"></div>
-      <div class="plant">🌿</div>
-      <div class="floor-line"></div>
-      <div class="client" id="client">🙂</div>
-      <div class="bubble" id="bubble">Новый клиент ждёт стрижку!</div>
-    </section>
-
-    <section class="panel">
-      <h2>Текущая смена</h2>
-      <p id="status">Клиент готов. Нажми «Начать стрижку».</p>
-      <div class="progress"><div id="progressBar"></div></div>
-      <button id="cutBtn" class="primary">✂️ Начать стрижку</button>
-      <button id="upgradeBtn" class="secondary">💺 Купить кресло — 300 🪙</button>
-      <button id="resetBtn" class="ghost">Сбросить тестовый прогресс</button>
-    </section>
-
-    <section class="panel bonus-panel">
-      <h2>🎁 Бонусы на реальные стрижки</h2>
-      <p>В этой тестовой версии бонусы пока не начисляются. Подключим их после настройки серверного API.</p>
-      <button id="bookingBtn" class="secondary">📅 Записаться на стрижку</button>
-    </section>
-  </main>
-  <script src="game.js"></script>
-</body>
-</html>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Barber Empire</title>
+<style>
+:root{--bg:#0d0b14;--p:#1d1729;--p2:#2b2140;--t:#fff;--m:#aaa0bd;--g:#f6c453;--v:#9557ff;--gr:#54e0a1}*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}body{margin:0;background:radial-gradient(circle at top,#352448,#0d0b14 70%);font-family:Arial,sans-serif;color:var(--t)}button{border:0;border-radius:15px;padding:13px;color:#fff;font-weight:800;background:linear-gradient(135deg,#a05dff,#6335bd);font-size:15px}button:disabled{opacity:.35}.app{max-width:760px;margin:auto;padding:15px}.head{display:flex;justify-content:space-between;gap:10px;align-items:center}.logo{font-size:23px;font-weight:900}.logo span{color:var(--g)}.small,.muted{color:var(--m);font-size:13px}.wallet{display:flex;gap:6px;flex-wrap:wrap;justify-content:end}.coin{background:#241b34;border:1px solid #fff1;border-radius:12px;padding:8px;font-weight:800;font-size:13px}.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:15px 0}.tabs button{background:#241b34;color:#bcb0d0;font-size:13px;padding:12px 5px}.tabs .active{background:linear-gradient(135deg,#a05dff,#6335bd);color:white}.panel{background:linear-gradient(145deg,#251b34,#15111e);border:1px solid #fff2;border-radius:21px;padding:16px;margin-bottom:14px;box-shadow:0 10px 30px #0003}h2{margin:0 0 8px;font-size:21px}.scene{height:215px;border-radius:17px;overflow:hidden;position:relative;background:linear-gradient(#4b365b 0 58%,#30233b 58%);margin-top:12px}.scene:before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0 55px,#fff1 56px 57px)}.sign{position:absolute;top:17px;left:50%;transform:translateX(-50%);background:#17121f;border:3px solid var(--g);padding:10px 17px;border-radius:11px;color:var(--g);font-weight:900;white-space:nowrap}.mirror{position:absolute;right:20px;top:65px;width:95px;height:95px;border:8px solid #b18ad8;border-radius:50%;background:#31233f}.client{position:absolute;left:18px;bottom:20px;font-size:65px}.chair{position:absolute;bottom:24px;left:50%;transform:translateX(-50%);width:100px;height:100px;background:#17121f;border:5px solid #5e466d;border-radius:28px 28px 12px 12px}.chair:before{content:"";position:absolute;top:-45px;left:18px;width:55px;height:65px;background:#17121f;border:5px solid #5e466d;border-radius:25px 25px 10px 10px}.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px}.stat{background:#241b34;border-radius:15px;padding:12px}.stat b{display:block;font-size:24px;margin-top:5px}.progress{height:12px;background:#0e0b14;border-radius:20px;overflow:hidden;margin:12px 0}.progress div{height:100%;width:0;background:linear-gradient(90deg,var(--gr),var(--g));transition:width .2s}.actions{display:grid;grid-template-columns:1fr 1fr;gap:9px}.action{background:#241b34;border-radius:16px;padding:12px}.action button{width:100%;margin-top:9px}.notice{color:var(--gr);font-weight:800;min-height:20px;margin-top:10px}.shopitem{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 0;border-bottom:1px solid #fff2}.shopitem:last-child{border:0}.shopitem button{font-size:12px;padding:10px}.hidden{display:none!important}footer{text-align:center;color:#786c8e;font-size:12px;margin-top:16px}@media(max-width:420px){.actions{grid-template-columns:1fr}.scene{height:190px}.logo{font-size:21px}}
+</style></head>
+<body><div class="app">
+<header class="head"><div><div class="logo">💈 BARBER <span>EMPIRE</span></div><div class="small">Твой виртуальный барбершоп</div></div><div class="wallet"><div class="coin">🪙 <span id="coins">500</span></div><div class="coin">🎁 <span id="bonus">0</span></div></div></header>
+<div class="tabs"><button class="active" data-tab="salon">🏠 Салон</button><button data-tab="shop">🛠 Улучшения</button><button data-tab="profile">👤 Профиль</button></div>
+<section id="salon"><div class="panel"><h2>Твой барбершоп</h2><div class="muted">Уровень <b id="level">1</b> · Репутация <b id="rep">0</b></div><div class="scene"><div class="sign">BARBER EMPIRE</div><div class="mirror"></div><div class="client">🧔🏻</div><div class="chair"></div></div><div class="stats"><div class="stat"><span class="muted">Обслужено</span><b id="served">0</b></div><div class="stat"><span class="muted">Кресла</span><b id="chairs">1</b></div></div></div>
+<div class="panel"><h2>✂️ Клиент ждёт стрижку</h2><div class="muted" id="customer">Новый клиент готов. Сделай идеальную стрижку!</div><div class="progress"><div id="cutProgress"></div></div><div class="actions"><div class="action"><b>✂️ Стричь</b><div class="small">Нажимай, пока шкала не заполнится.</div><button id="cutBtn">Начать стрижку</button></div><div class="action"><b>🎁 Награда</b><div class="small">За стрижку получаешь монеты и бонусы.</div><button id="finishBtn" disabled>Завершить</button></div></div><div class="notice" id="notice"></div></div></section>
+<section id="shop" class="hidden"><div class="panel"><h2>🛠 Улучшения салона</h2><div class="muted">Покупай улучшения за игровые монеты.</div><div class="shopitem"><div><b>🪑 Второе кресло</b><div class="small">Повышает престиж салона.</div></div><button id="chairBuy">Купить · 300 🪙</button></div><div class="shopitem"><div><b>⚡ Проф. машинка</b><div class="small">Больше монет за стрижку.</div></div><button id="toolBuy">Купить · 450 🪙</button></div><div class="shopitem"><div><b>✨ Премиум интерьер</b><div class="small">Повышает репутацию.</div></div><button id="decorBuy">Купить · 700 🪙</button></div></div></section>
+<section id="profile" class="hidden"><div class="panel"><h2>👤 Профиль игрока</h2><p class="muted">Прогресс сохраняется на этом устройстве.</p><div class="stats"><div class="stat">Монеты<b id="pCoins">500</b></div><div class="stat">Бонусы<b id="pBonus">0</b></div><div class="stat">Уровень<b id="pLevel">1</b></div><div class="stat">Репутация<b id="pRep">0</b></div></div><button id="resetBtn" style="margin-top:12px;background:#472333">Сбросить прогресс</button></div></section>
+<footer>Barber Empire · игровая версия · реальные бонусы подключаются отдельно</footer></div>
+<script>
+const $=id=>document.getElementById(id);let state=JSON.parse(localStorage.getItem('barberEmpireSave')||'null')||{coins:500,bonus:0,level:1,rep:0,served:0,chairs:1,tool:false,decor:false,cut:0};let cutting=false;
+function save(){localStorage.setItem('barberEmpireSave',JSON.stringify(state));render()}function render(){['coins','bonus','level','rep','served','chairs'].forEach(k=>$(k).textContent=state[k]);$('pCoins').textContent=state.coins;$('pBonus').textContent=state.bonus;$('pLevel').textContent=state.level;$('pRep').textContent=state.rep;$('cutProgress').style.width=state.cut+'%';$('chairBuy').disabled=state.chairs>1||state.coins<300;$('chairBuy').textContent=state.chairs>1?'Куплено ✓':'Купить · 300 🪙';$('toolBuy').disabled=state.tool||state.coins<450;$('toolBuy').textContent=state.tool?'Куплено ✓':'Купить · 450 🪙';$('decorBuy').disabled=state.decor||state.coins<700;$('decorBuy').textContent=state.decor?'Куплено ✓':'Купить · 700 🪙'}function note(t){$('notice').textContent=t}
+$('cutBtn').onclick=()=>{if(cutting)return;cutting=true;state.cut=0;note('Стрижка началась! ✂️');$('cutBtn').textContent='Стрижём...';const timer=setInterval(()=>{state.cut+=state.tool?12:8;if(state.cut>=100){state.cut=100;clearInterval(timer);cutting=false;$('cutBtn').textContent='Готово ✓';$('finishBtn').disabled=false;note('Отлично! Клиент доволен.')}render()},180)};
+$('finishBtn').onclick=()=>{if(state.cut<100)return;let earned=state.tool?80:50;state.coins+=earned;state.bonus+=5;state.rep+=state.decor?3:1;state.served++;state.level=1+Math.floor(state.served/5);state.cut=0;$('cutBtn').textContent='Начать стрижку';$('finishBtn').disabled=true;$('customer').textContent=['Новый клиент ждёт!','Клиент хочет модную стрижку.','Пора сделать свежий fade!','Клиент пришёл за идеальным стилем.'][Math.floor(Math.random()*4)];note('Награда: +'+earned+' 🪙 и +5 🎁 бонусов!');save()};
+$('chairBuy').onclick=()=>{if(state.coins>=300&&state.chairs===1){state.coins-=300;state.chairs=2;note('Открыто второе кресло!');save()}};$('toolBuy').onclick=()=>{if(state.coins>=450&&!state.tool){state.coins-=450;state.tool=true;note('Профессиональная машинка куплена!');save()}};$('decorBuy').onclick=()=>{if(state.coins>=700&&!state.decor){state.coins-=700;state.decor=true;note('Интерьер улучшен!');save()}};$('resetBtn').onclick=()=>{if(confirm('Сбросить весь прогресс?')){localStorage.removeItem('barberEmpireSave');location.reload()}};
+document.querySelectorAll('[data-tab]').forEach(btn=>btn.onclick=()=>{document.querySelectorAll('[data-tab]').forEach(b=>b.classList.remove('active'));btn.classList.add('active');['salon','shop','profile'].forEach(id=>$(id).classList.toggle('hidden',id!==btn.dataset.tab))});render();
+</script></body></html>
